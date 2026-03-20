@@ -21,9 +21,7 @@ Current solution is to set `approx = F`.
 
 ## Next Steps
 
-The principal components in PCA can have flipped signed because the sign is mathemtically not identifiable. The issue is that this happens even when fixing a seed. So far, we could reproduce by running it on AMD and Intel processors. Not reported on the issue page on `irlba` repo yet.
-
-Within processor seems OK. Some todos:
+The principal components in PCA can have flipped signed because the sign is mathemtically not identifiable. The issue is that this happens even when fixing a seed. So far, we could reproduce by running it on AMD and Intel processors. Not reported on the issue page on `irlba` repo yet. Within processor seems OK. Some todos:
 
 - Check code in `irlba`
 - Open issue on `irlba` repo
