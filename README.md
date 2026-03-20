@@ -9,3 +9,6 @@ Run this on terminal on the clsuter:
 ```shell
 bash sign.sh
 ```
+## Backgound
+
+Issue in `RunPCA` in Seurat when `approx = T`. Eventually calls `irlba` in R package `irlba`.
