@@ -1,4 +1,4 @@
-# Reprobucility Issue in Seurat
+# Reproducibility Issue in Seurat
 
 Celina discovered an reproducibilty issue with clustering in her spatial data. In this repo, we track our investigations.
 
