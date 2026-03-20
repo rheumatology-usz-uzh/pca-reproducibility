@@ -4,7 +4,7 @@ Celina discovered an reproducibilty issue with clustering in her spatial data. I
 
 ## Usage
 
-Run this on terminal on the clsuter:
+Run this on terminal on the cluster:
 
 ```shell
 bash sign.sh
