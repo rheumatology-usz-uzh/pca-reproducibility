@@ -23,8 +23,8 @@ Current solution is to set `approx = F`.
 
 ## Next Steps
 
-[ ] Check code in `irlba`
-[ ] Open issue on `irlba` repo
-[ ] Sent pull request with a fix
-[ ] Paper raising awarness of this kind of issues, use it as an example
-[ ] Bioconductor will have the same issue, one can workaround by selecting another PCA implementtion
+- [ ] Check code in `irlba`
+- [ ] Open issue on `irlba` repo
+- [ ] Sent pull request with a fix
+- [ ] Paper raising awarness of this kind of issues, use it as an example
+- [ ] Bioconductor will have the same issue, one can workaround by selecting another PCA implementtion
