@@ -23,6 +23,6 @@ Current solution is to set `approx = F`.
 
 ## Next Steps
 
-- [x] Check code in `irlba` -> not a bug, looks like it's a low-level differences in the linear algebra libraries BLAS and LAPACK
-- [ ] Reproduce issue in Seurat clustering [tutorial](https://satijalab.org/seurat/articles/pbmc3k_tutorial.html) by flipping sign after PCA, then running `FindNeighbors` and `FindClusters`. These functions should be invariant to the sign flip.
+- [x] Check code in `irlba` -> not a bug, looks like it's a low-level difference in the linear algebra libraries BLAS and LAPACK
+- [ ] Reproduce issue in Seurat clustering [tutorial](https://satijalab.org/seurat/articles/pbmc3k_tutorial.html) by flipping sign after PCA, then running `FindNeighbors` and `FindClusters`. The clusters should be invariant to sign flips in PCs.
 - [ ] Paper raising awarness of this kind of issues, use it as an example
