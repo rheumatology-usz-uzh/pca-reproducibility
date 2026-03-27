@@ -23,8 +23,6 @@ Current solution is to set `approx = F`.
 
 ## Next Steps
 
-- [ ] Check code in `irlba`
-- [ ] Open issue on `irlba` repo
-- [ ] Sent pull request with a fix
+- [x] Check code in `irlba` -> not a bug, looks like it's a low-level differences in the linear algebra libraries BLAS and LAPACK
+- [ ] Reproduce issue in Seurat clustering [tutorial](https://satijalab.org/seurat/articles/pbmc3k_tutorial.html) by flipping sign after PCA, then running `FindNeighbors` and `FindClusters`. These functions should be invariant to the sign flip.
 - [ ] Paper raising awarness of this kind of issues, use it as an example
-- [ ] Bioconductor will have the same issue, one can workaround by selecting another PCA implementtion
