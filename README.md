@@ -26,5 +26,8 @@ Current solution is to set `approx = F`.
 - [x] Check code in `irlba` -> not a bug, looks like it's a low-level difference in the linear algebra libraries BLAS and LAPACK
 - [x] Reproduce issue in Seurat clustering [tutorial](https://satijalab.org/seurat/articles/pbmc3k_tutorial.html) by flipping sign after PCA, then running `FindNeighbors` and `FindClusters`. The clusters should be invariant to sign flips in PCs. -> Flipping signs doesn't affect UMAP or clustering. The issue must be in the numerical errors in `irlba`, not the signs.
 - [x] Find paper on numerical error propagation in the iterative algorithm used in `irlba`. -> Didn't find anything.
-- [ ] Write paper to raise awarness of this kind of issues. Motivate using Seurat and `approx = T` as default setting. Give an numerical illustration of the propegation of error. Use ideas from statistical literature on round-off errors, e.g., [Diaconis and Freedman](https://drive.google.com/file/d/1GjD5WARrmAuF4wN0IJGEuCBK9judpcD4/view).
+- [ ] Write paper to raise awarness of this kind of issues:
+    - Motivate using Seurat and `approx = T` as default setting.
+    - Give numerical illustration of the propegation of error.
+    - Use ideas from statistical literature on round-off errors, e.g., [Diaconis and Freedman](https://drive.google.com/file/d/1GjD5WARrmAuF4wN0IJGEuCBK9judpcD4/view).
 - [ ] Send abstract to conference on [Symposium on Meta Science for Methods Research](https://crsuzh.pages.uzh.ch/msmr/)
