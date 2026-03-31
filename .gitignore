@@ -2,7 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
-amd.html
-intel.html
 pca-sign-reproducibility.Rproj
 filtered_gene_bc_matrices
+*.html
+*.rds

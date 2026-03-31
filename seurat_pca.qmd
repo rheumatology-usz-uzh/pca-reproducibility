@@ -69,15 +69,7 @@ pbmc <- RunPCA(pbmc, features = VariableFeatures(object = pbmc), approx = TRUE,
 pbmc <- NormalizePCASigns(pbmc)
 DimPlot(pbmc, reduction = "pca") + NoLegend()
 
-# cluster
-pbmc <- FindNeighbors(pbmc, dims = 1:n_dim, seed.use = seed)
-pbmc <- FindClusters(pbmc, resolution = 0.5, random.seed = seed)
-
-# visualize clusters
-pbmc <- RunUMAP(pbmc, dims = 1:n_dim, seed.use = seed)
-
-# individual clusters
-DimPlot(pbmc, reduction = "umap")
+SaveSeuratRds(pbmc, file = "pbmc.rds")
 ```
 
 Explore loadings.

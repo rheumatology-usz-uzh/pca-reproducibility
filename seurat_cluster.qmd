@@ -1,0 +1,43 @@
+---
+title: "Reproducibility Seurat Clustering"
+author: "Celina Geiss and Christof Seiler"
+format: html
+date: now
+editor: source
+embed-resources: true
+execute:
+  warning: false
+---
+
+## Tutorial
+
+```{r}
+library(dplyr)
+library(Seurat)
+library(patchwork)
+
+seed <- 23
+n_dim <- 10
+set.seed(seed)
+
+pbmc <- LoadSeuratRds(file = "pbmc.rds")
+
+# cluster
+pbmc <- FindNeighbors(pbmc, dims = 1:n_dim, seed.use = seed)
+pbmc <- FindClusters(pbmc, resolution = 0.5, random.seed = seed)
+
+# visualize clusters
+pbmc <- RunUMAP(pbmc, dims = 1:n_dim, seed.use = seed)
+
+# individual clusters
+DimPlot(pbmc, reduction = "umap")
+```
+
+## Reproducibility
+
+```{r}
+sessionInfo()
+extSoftVersion()
+cpu <- try(system("lscpu | grep 'Model name'", intern = TRUE))
+cpu
+```
