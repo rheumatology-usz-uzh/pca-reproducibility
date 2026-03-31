@@ -9,14 +9,34 @@ execute:
   warning: false
 ---
 
-# Hardware
+## Helper
+
+Helper function to avoid sign flip. This is just a heuristic and is not guaranteed to work.
 
 ```{r}
-cpu <- try(system("lscpu | grep 'Model name'", intern = TRUE))
-cpu
+NormalizePCASigns <- function(object, reduction = "pca") {
+  
+  loadings <- Loadings(object, reduction = reduction)
+  embeddings <- Embeddings(object, reduction = reduction)
+  
+  for (i in seq_len(ncol(loadings))) {
+    
+    max_idx <- which.max(abs(loadings[, i]))
+    
+    if (loadings[max_idx, i] < 0) {
+      loadings[, i] <- loadings[, i] * -1
+      embeddings[, i] <- embeddings[, i] * -1
+    }
+  }
+  
+  object[[reduction]]@feature.loadings <- loadings
+  object[[reduction]]@cell.embeddings <- embeddings
+  
+  return(object)
+}
 ```
 
-## Aim
+## Tutorial
 
 Check reproducibility issue in Seurat clustering [tutorial](https://satijalab.org/seurat/articles/pbmc3k_tutorial.html).
 
@@ -24,6 +44,9 @@ Check reproducibility issue in Seurat clustering [tutorial](https://satijalab.or
 library(dplyr)
 library(Seurat)
 library(patchwork)
+
+seed <- 23
+set.seed(seed)
 
 # load
 pbmc.data <- Read10X(data.dir = "filtered_gene_bc_matrices/hg19/")
@@ -40,18 +63,28 @@ all.genes <- rownames(pbmc)
 pbmc <- ScaleData(pbmc, features = all.genes)
 
 # pca
-pbmc <- RunPCA(pbmc, features = VariableFeatures(object = pbmc), approx = TRUE)
+pbmc <- RunPCA(pbmc, features = VariableFeatures(object = pbmc), approx = TRUE,
+               seed.use = seed)
+pbmc <- NormalizePCASigns(pbmc)
 DimPlot(pbmc, reduction = "pca") + NoLegend()
 
 # cluster
-pbmc <- FindNeighbors(pbmc, dims = 1:10)
-pbmc <- FindClusters(pbmc, resolution = 0.5)
+pbmc <- FindNeighbors(pbmc, dims = 1:30, seed.use = seed)
+pbmc <- FindClusters(pbmc, resolution = 0.5, random.seed = seed)
 
 # visualize clusters
-pbmc <- RunUMAP(pbmc, dims = 1:10)
+pbmc <- RunUMAP(pbmc, 1:30, seed.use = seed)
 
 # individual clusters
 DimPlot(pbmc, reduction = "umap")
+```
+
+Explore loadings.
+
+```{r}
+pbmc |> 
+  Loadings() |> 
+  head()
 ```
 
 ## Reproducibility
@@ -59,4 +92,6 @@ DimPlot(pbmc, reduction = "umap")
 ```{r}
 sessionInfo()
 extSoftVersion()
+cpu <- try(system("lscpu | grep 'Model name'", intern = TRUE))
+cpu
 ```
