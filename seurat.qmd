@@ -63,9 +63,27 @@ pbmc <- FindVariableFeatures(pbmc, selection.method = "vst", nfeatures = 2000)
 all.genes <- rownames(pbmc)
 pbmc <- ScaleData(pbmc, features = all.genes)
 
-# pca
+# PCA in Seurat 
 pbmc <- RunPCA(pbmc, features = VariableFeatures(object = pbmc), approx = TRUE,
                npcs = n_dim, seed.use = seed)
+# PCA in Bioconductor
+pbmc_sce <- as.SingleCellExperiment(pbmc)
+pbmc_sce <- runPCA(pbmc_sce,
+                   subset_row = VariableFeatures(object = pbmc),
+                   exprs_values = "scaledata",
+                   ncomponents = n_dim,
+                   BSPARAM = IrlbaParam(),
+                   name = "IRLBA")
+
+# overwrite Seurat with Bioconductor
+embeddings <- reducedDim(pbmc_sce, "IRLBA")
+colnames(embeddings) <- paste0("PC_", 1:n_dim)
+pbmc[["pca"]]@cell.embeddings <- embeddings
+loadings <- attr(reducedDim(pbmc_sce, "IRLBA"), "rotation")
+colnames(loadings) <- paste0("PC_", 1:n_dim)
+pbmc[["pca"]]@feature.loadings <- loadings
+pbmc[["pca"]]@stdev <- attr(reducedDim(pbmc_sce, "IRLBA"), "percentVar")
+
 pbmc <- NormalizePCASigns(pbmc)
 DimPlot(pbmc, reduction = "pca") + NoLegend()
 
