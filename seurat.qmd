@@ -92,7 +92,10 @@ pbmc_sce <- runPCA(pbmc_sce,
                    subset_row = VariableFeatures(object = pbmc),
                    exprs_values = "scaledata",
                    ncomponents = n_dim,
-                   BSPARAM = IrlbaParam())
+                   #BSPARAM = ExactParam()  # exact SVD
+                   BSPARAM = IrlbaParam()  # approximate SVD with irlba
+                   #BSPARAM = RandomParam() # approximate SVD with rsvd
+                   ) 
 pbmc <- OverwriteSeurat(pbmc, pbmc_sce)
 
 # align PCA signs
