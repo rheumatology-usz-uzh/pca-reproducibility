@@ -31,8 +31,25 @@ NormalizePCASigns <- function(object, reduction = "pca") {
   
   object[[reduction]]@feature.loadings <- loadings
   object[[reduction]]@cell.embeddings <- embeddings
+  object
   
-  return(object)
+}
+```
+
+Helper function to overwrite Seurat with Bioconductor.
+
+```{r}
+OverwriteSeurat <- function(object, sce, reduction = "pca") {
+  
+  embeddings <- reducedDim(sce, "PCA")
+  colnames(embeddings) <- paste0("PC_", 1:n_dim)
+  object[[reduction]]@cell.embeddings <- embeddings
+  loadings <- attr(reducedDim(sce, "PCA"), "rotation")
+  colnames(loadings) <- paste0("PC_", 1:n_dim)
+  object[[reduction]]@feature.loadings <- loadings
+  object[[reduction]]@stdev <- attr(reducedDim(sce, "PCA"), "percentVar")
+  object
+  
 }
 ```
 
@@ -44,6 +61,8 @@ Check reproducibility issue in Seurat clustering [tutorial](https://satijalab.or
 library(dplyr)
 library(Seurat)
 library(patchwork)
+library(scater)
+library(BiocSingular)
 
 seed <- 23
 n_dim <- 10
@@ -66,24 +85,17 @@ pbmc <- ScaleData(pbmc, features = all.genes)
 # PCA in Seurat 
 pbmc <- RunPCA(pbmc, features = VariableFeatures(object = pbmc), approx = TRUE,
                npcs = n_dim, seed.use = seed)
+
 # PCA in Bioconductor
 pbmc_sce <- as.SingleCellExperiment(pbmc)
 pbmc_sce <- runPCA(pbmc_sce,
                    subset_row = VariableFeatures(object = pbmc),
                    exprs_values = "scaledata",
                    ncomponents = n_dim,
-                   BSPARAM = IrlbaParam(),
-                   name = "IRLBA")
+                   BSPARAM = IrlbaParam())
+pbmc <- OverwriteSeurat(pbmc, pbmc_sce)
 
-# overwrite Seurat with Bioconductor
-embeddings <- reducedDim(pbmc_sce, "IRLBA")
-colnames(embeddings) <- paste0("PC_", 1:n_dim)
-pbmc[["pca"]]@cell.embeddings <- embeddings
-loadings <- attr(reducedDim(pbmc_sce, "IRLBA"), "rotation")
-colnames(loadings) <- paste0("PC_", 1:n_dim)
-pbmc[["pca"]]@feature.loadings <- loadings
-pbmc[["pca"]]@stdev <- attr(reducedDim(pbmc_sce, "IRLBA"), "percentVar")
-
+# align PCA signs
 pbmc <- NormalizePCASigns(pbmc)
 DimPlot(pbmc, reduction = "pca") + NoLegend()
 
