@@ -1,0 +1,118 @@
+---
+title: "Reproducibility Dataset Integration"
+author: "Celina Geiss and Christof Seiler"
+format: html
+date: now
+editor: source
+embed-resources: true
+execute:
+  warning: false
+---
+
+## Tutorial
+
+Check reproducibility issue in OSCA dataset integration [chapter](https://bioconductor.org/books/release/OSCA.multisample/integrating-datasets.html#mnn-correction).
+
+## Quick Start
+
+Setup.
+
+```{r}
+#--- loading ---#
+library(TENxPBMCData)
+all.sce <- list(
+    pbmc3k=TENxPBMCData('pbmc3k'),
+    pbmc4k=TENxPBMCData('pbmc4k'),
+    pbmc8k=TENxPBMCData('pbmc8k')
+)
+
+#--- quality-control ---#
+library(scater)
+stats <- high.mito <- list()
+for (n in names(all.sce)) {
+    current <- all.sce[[n]]
+    is.mito <- grep("MT", rowData(current)$Symbol_TENx)
+    stats[[n]] <- perCellQCMetrics(current, subsets=list(Mito=is.mito))
+    high.mito[[n]] <- isOutlier(stats[[n]]$subsets_Mito_percent, type="higher")
+    all.sce[[n]] <- current[,!high.mito[[n]]]
+}
+
+#--- normalization ---#
+all.sce <- lapply(all.sce, logNormCounts)
+
+#--- variance-modelling ---#
+library(scran)
+all.dec <- lapply(all.sce, modelGeneVar)
+all.hvgs <- lapply(all.dec, getTopHVGs, prop=0.1)
+
+#--- dimensionality-reduction ---#
+library(BiocSingular)
+set.seed(10000)
+all.sce <- mapply(FUN=runPCA, x=all.sce, subset_row=all.hvgs, 
+    MoreArgs=list(ncomponents=25, BSPARAM=RandomParam()), 
+    SIMPLIFY=FALSE)
+
+set.seed(100000)
+all.sce <- lapply(all.sce, runTSNE, dimred="PCA")
+
+set.seed(1000000)
+all.sce <- lapply(all.sce, runUMAP, dimred="PCA")
+
+#--- clustering ---#
+for (n in names(all.sce)) {
+    g <- buildSNNGraph(all.sce[[n]], k=10, use.dimred='PCA')
+    clust <- igraph::cluster_walktrap(g)$membership
+    colLabels(all.sce[[n]])  <- factor(clust)
+}
+```
+
+First dataset.
+
+```{r}
+pbmc3k <- all.sce$pbmc3k
+dec3k <- all.dec$pbmc3k
+pbmc3k
+```
+
+Second dataset.
+
+```{r}
+pbmc4k <- all.sce$pbmc4k
+dec4k <- all.dec$pbmc4k
+pbmc4k
+```
+
+Batch correction.
+
+```{r}
+library(batchelor)
+
+set.seed(23)
+quick.corrected <- quickCorrect(pbmc3k, pbmc4k, 
+   precomputed=list(dec3k, dec4k),
+   PARAM=FastMnnParam(BSPARAM=BiocSingular::IrlbaParam()))
+
+quick.sce <- quick.corrected$corrected
+quick.sce
+```
+
+Visualize alignment.
+
+```{r}
+library(scater)
+set.seed(00101010)
+quick.sce <- runTSNE(quick.sce, dimred="corrected")
+quick.sce <- runUMAP(quick.sce, dimred="corrected")
+quick.sce$batch <- factor(quick.sce$batch)
+plotTSNE(quick.sce, colour_by="batch")
+plotUMAP(quick.sce, colour_by="batch")
+```
+
+## Reproducibility
+
+```{r}
+sessionInfo()
+extSoftVersion()
+cpu <- try(system("lscpu | grep 'Model name'", intern = TRUE))
+cpu
+```
