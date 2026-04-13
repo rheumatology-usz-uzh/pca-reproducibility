@@ -2,7 +2,7 @@
 
 Celina discovered an reproducibilty issue with clustering in her spatial data. In this repo, we track our investigations.
 
-The principal components in PCA can have flipped signed because the sign is mathemtically not identifiable. The issue is that this happens even when fixing a seed. So far, we could reproduce by running it on AMD and Intel processors. Not reported on the issue page on `irlba` repo yet. Within processor seems OK. 
+The principal components in PCA can have flipped signed because the sign is mathematically not identifiable. The issue is that this happens even when fixing a seed. So far, we could reproduce by running it on AMD and Intel processors. Not reported on the issue page on `irlba` repo yet. Within processor seems OK. 
 
 ## Usage
 
@@ -32,8 +32,8 @@ Current solution is to set `approx = F`.
 - [x] Reproduce issue in Seurat clustering [tutorial](https://satijalab.org/seurat/articles/pbmc3k_tutorial.html) by flipping sign after PCA, then running `FindNeighbors` and `FindClusters`. The clusters should be invariant to sign flips in PCs. -> Flipping signs doesn't affect UMAP or clustering. The issue must be in the numerical errors in `irlba`, not the signs.
 - [x] Find paper on numerical error propagation in the iterative algorithm used in `irlba`. -> Didn't find anything.
 - [x] Reproduce issue in data integration from OSCA [book](https://bioconductor.org/books/release/OSCA.multisample/integrating-datasets.html#mnn-correction)
-- [ ] Write paper to raise awarness of this kind of issues:
+- [ ] Write paper to raise awareness of this kind of issues:
     - Motivate using Seurat and `approx = T` as default setting.
-    - Give numerical illustration of the propegation of error.
+    - Give numerical illustration of the propagation of error.
     - Use ideas from statistical literature on round-off errors, e.g., [Diaconis and Freedman](https://drive.google.com/file/d/1GjD5WARrmAuF4wN0IJGEuCBK9judpcD4/view).
 - [ ] Send abstract to conference on [Symposium on Meta Science for Methods Research](https://crsuzh.pages.uzh.ch/msmr/)
