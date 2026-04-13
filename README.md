@@ -17,6 +17,11 @@ Issue in `RunPCA` in Seurat when `approx = T`. Eventually calls `irlba` in R pac
 
 This happens in `R/dimensional_reduction.R` [here](https://github.com/satijalab/seurat/blob/3f6462bbdc4e3d78e5c070ed0fc512b5a5bc3351/R/dimensional_reduction.R#L944-L945).
 
+## Related Work
+
+- Found reproducibility issue in scanpy for [UMAP and Leiden analysis](https://github.com/grst/scanpy_reproducibility)
+- Also mentioned in PCA [tutorial](https://ehrapy.readthedocs.io/en/latest/tutorials/notebooks/mimic_2_introduction.html#principle-component-analysis-pca) in ehrapy using scanpy
+
 ## Workaround
 
 Current solution is to set `approx = F`.
@@ -27,8 +32,6 @@ Current solution is to set `approx = F`.
 - [x] Reproduce issue in Seurat clustering [tutorial](https://satijalab.org/seurat/articles/pbmc3k_tutorial.html) by flipping sign after PCA, then running `FindNeighbors` and `FindClusters`. The clusters should be invariant to sign flips in PCs. -> Flipping signs doesn't affect UMAP or clustering. The issue must be in the numerical errors in `irlba`, not the signs.
 - [x] Find paper on numerical error propagation in the iterative algorithm used in `irlba`. -> Didn't find anything.
 - [x] Reproduce issue in data integration from OSCA [book](https://bioconductor.org/books/release/OSCA.multisample/integrating-datasets.html#mnn-correction)
-- [x] Found reproducibility issue in scanpy for [UMAP and Leiden analysis](https://github.com/grst/scanpy_reproducibility)
-- [x] Also mentioned in PCA [tutorial](https://ehrapy.readthedocs.io/en/latest/tutorials/notebooks/mimic_2_introduction.html#principle-component-analysis-pca) in ehrapy using scanpy
 - [ ] Write paper to raise awarness of this kind of issues:
     - Motivate using Seurat and `approx = T` as default setting.
     - Give numerical illustration of the propegation of error.
