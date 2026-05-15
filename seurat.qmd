@@ -124,6 +124,7 @@ pbmc |>
 ## Reproducibility
 
 ```{r}
+.libPaths()
 sessionInfo()
 extSoftVersion()
 cpu <- try(system("lscpu | grep 'Model name'", intern = TRUE))

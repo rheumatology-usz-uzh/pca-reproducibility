@@ -2,6 +2,7 @@
 
 system("lscpu | grep 'Model name'")
 system("ldd $(R RHOME)/lib/libR.so")
+.libPaths()
 
 set.seed(1)
 
