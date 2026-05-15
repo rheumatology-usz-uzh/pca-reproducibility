@@ -9,6 +9,21 @@ execute:
   warning: false
 ---
 
+# Setup
+
+```{r}
+library(dplyr)
+library(Seurat)
+library(patchwork)
+library(scater)
+library(BiocSingular)
+library(stringr)
+
+seed <- 23
+n_dim <- 100
+set.seed(seed)
+```
+
 ## Helper
 
 Helper function to avoid sign flip. This is just a heuristic and is not guaranteed to work.
@@ -58,16 +73,6 @@ OverwriteSeurat <- function(object, sce, reduction = "pca") {
 Check reproducibility issue in Seurat clustering [tutorial](https://satijalab.org/seurat/articles/pbmc3k_tutorial.html).
 
 ```{r}
-library(dplyr)
-library(Seurat)
-library(patchwork)
-library(scater)
-library(BiocSingular)
-
-seed <- 23
-n_dim <- 10
-set.seed(seed)
-
 # load
 pbmc.data <- Read10X(data.dir = "filtered_gene_bc_matrices/hg19/")
 pbmc <- CreateSeuratObject(counts = pbmc.data, project = "pbmc3k",
@@ -83,7 +88,7 @@ all.genes <- rownames(pbmc)
 pbmc <- ScaleData(pbmc, features = all.genes)
 
 # PCA in Seurat 
-pbmc <- RunPCA(pbmc, features = VariableFeatures(object = pbmc), approx = TRUE,
+pbmc <- RunPCA(pbmc, features = VariableFeatures(object = pbmc), approx = FALSE,
                npcs = n_dim, seed.use = seed)
 
 # PCA in Bioconductor
@@ -121,12 +126,22 @@ pbmc |>
   head()
 ```
 
+Save embeddings for followup analysis.
+
+```{r}
+cpu <- try(system("lscpu | grep 'Model name'", intern = TRUE))
+cpu_name <- cpu |> 
+  str_detect("AMD") |>
+  ifelse("AMD", "Intel") |> 
+  str_to_lower()
+write.csv(Embeddings(pbmc), file = paste0(cpu_name, ".csv"), row.names = FALSE)
+```
+
 ## Reproducibility
 
 ```{r}
 .libPaths()
 sessionInfo()
 extSoftVersion()
-cpu <- try(system("lscpu | grep 'Model name'", intern = TRUE))
 cpu
 ```

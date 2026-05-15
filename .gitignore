@@ -6,3 +6,4 @@ pca-sign-reproducibility.Rproj
 filtered_gene_bc_matrices
 *.html
 *.rds
+*.csv
