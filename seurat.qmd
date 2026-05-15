@@ -88,7 +88,8 @@ all.genes <- rownames(pbmc)
 pbmc <- ScaleData(pbmc, features = all.genes)
 
 # PCA in Seurat 
-pbmc <- RunPCA(pbmc, features = VariableFeatures(object = pbmc), approx = FALSE,
+pbmc <- RunPCA(pbmc, features = VariableFeatures(object = pbmc), 
+               approx = FALSE, # will be overwritten by the Bioconductor PCA
                npcs = n_dim, seed.use = seed)
 
 # PCA in Bioconductor
