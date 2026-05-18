@@ -13,7 +13,6 @@ for CPU in ${CPU_TYPES[@]}; do
     for PCA in ${PCA_ALGOS[@]}; do
 
         echo "pca algorithm:" $PCA
-
         srun --pty -n 1 -c 2 --time=01:00:00 --mem=7G \
           Rscript -e "quarto::quarto_render( \
             input = 'seurat.qmd', \
@@ -28,5 +27,5 @@ done
 echo "comparison"
 srun --pty -n 1 -c 2 --time=01:00:00 --mem=7G \
   Rscript -e "quarto::quarto_render( \
-    input = 'seurat_comparison.qmd') \
+    input = 'seurat_comparison.qmd' \
   )"

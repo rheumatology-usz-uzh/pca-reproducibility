@@ -54,7 +54,8 @@ df <- df |>
 
 # distribution
 ggplot(df, aes(value, group = pc, color = pc)) +
-  geom_freqpoly(bins = 100)
+  geom_freqpoly(bins = 100) +
+  facet_wrap(~algorithm, ncol = 1)
 
 # mean and sd
 df |>
@@ -63,6 +64,7 @@ df |>
     .by = c(pc, algorithm)
     ) |>
   ggplot(aes(pc, mean, color = algorithm)) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
   geom_line() + 
   geom_point()
 ```
