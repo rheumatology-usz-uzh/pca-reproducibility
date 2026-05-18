@@ -46,32 +46,30 @@ diff <- diff |>
   mutate(pc = str_remove(name, "PC_")) |>
   mutate(pc = as.integer(pc))
 
-diff |> 
-  filter(pc >= 10 & pc <= 20) |>
-  ggplot(aes(value, group = pc, color = pc)) +
-  geom_freqpoly(bins = 100)
-
 diff <- diff |> 
-  mutate(range_group = case_when(
-    pc <= 10 ~ "PCs 1-10",
-    pc > 10 & pc <= 90 ~ "PCs 11-90",
-    pc > 90 ~ "PCs 91-100"
-  ))
+  mutate(range_pc = cut(pc, 
+                        breaks = seq(0, 100, by = 10),
+                        include.lowest = TRUE))
+
+# distribution
+ggplot(diff, aes(value, group = pc, color = pc)) +
+  geom_freqpoly(bins = 100) +
+  facet_wrap(~range_pc, scales = "free")
 
 # mean and sd
 diff |>
-  group_by(pc, range_group) |>
+  group_by(pc, range_pc) |>
   summarize(mean = mean(value), 
             sd = sd(value)) |>
   ggplot(aes(pc, mean)) +
-  geom_line() +
+  geom_line() + 
   geom_point() +
   geom_errorbar(aes(ymin = mean - 1.96*sd, ymax = mean + 1.96*sd)) +
-  facet_wrap(~range_group, scales = "free")
+  facet_wrap(~range_pc, scales = "free")
 
 # median and quantiles
 diff |> 
-  group_by(pc, range_group) |>
+  group_by(pc, range_pc) |>
   summarize(median = median(value), 
             low = quantile(value, 0.05),
             high = quantile(value, 0.95)) |>
@@ -79,7 +77,7 @@ diff |>
   geom_line() +
   geom_point() +
   geom_errorbar(aes(ymin = low, ymax = high)) +
-  facet_wrap(~range_group, scales = "free")
+  facet_wrap(~range_pc, scales = "free")
 ```
 
 ## Reproducibility
