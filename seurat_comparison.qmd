@@ -7,8 +7,6 @@ editor: source
 embed-resources: true
 execute:
   warning: false
-params:
-  pca: "irlba"
 ---
 
 # Setup
@@ -21,63 +19,52 @@ library(stringr)
 set.seed(23)
 ```
 
-## Load Data
+## Mean Error Analysis
 
 Load matrices computed on AMD and Intel CPUs.
 
 ```{r}
-amd <- read.csv(file = paste0("amd_", params$pca, ".csv")) |> as.matrix()
-intel <- read.csv(file = paste0("intel_", params$pca, ".csv")) |> as.matrix()
+algorithm = c("exact", "irlba", "rsvd")
+file_amd = paste0("amd_", algorithm, ".csv")
+file_intel = paste0("intel_", algorithm, ".csv")
+
+df <- lapply(seq_along(algorithm), function(index) {
+
+  amd <- read.csv(file = file_amd[index]) |> as.matrix()
+  intel <- read.csv(file = file_intel[index]) |> as.matrix()
+  diff <- amd - intel
+  diff |> 
+    as_tibble() |>
+    mutate(
+      cell = 1:nrow(diff),
+      algorithm = algorithm[index]
+      )
+  
+  }) |>
+  bind_rows()
 ```
 
 Compare differences.
 
 ```{r}
-diff <- amd - intel
-range(diff)
-
-n_dim <- ncol(diff)
-n_cells <- nrow(diff)
-
-diff <- diff |> 
-  as_tibble() |>
-  mutate(cell = 1:n_cells) |>
+df <- df |> 
   pivot_longer(cols = starts_with("PC_")) |>
   mutate(pc = str_remove(name, "PC_")) |>
   mutate(pc = as.integer(pc))
 
-diff <- diff |> 
-  mutate(range_pc = cut(pc, 
-                        breaks = seq(0, 100, by = 10),
-                        include.lowest = TRUE))
-
 # distribution
-ggplot(diff, aes(value, group = pc, color = pc)) +
-  geom_freqpoly(bins = 100) +
-  facet_wrap(~range_pc, scales = "free")
+ggplot(df, aes(value, group = pc, color = pc)) +
+  geom_freqpoly(bins = 100)
 
 # mean and sd
-diff |>
-  group_by(pc, range_pc) |>
-  summarize(mean = mean(value), 
-            sd = sd(value)) |>
-  ggplot(aes(pc, mean)) +
+df |>
+  summarize(
+    mean = mean(value), 
+    .by = c(pc, algorithm)
+    ) |>
+  ggplot(aes(pc, mean, color = algorithm)) +
   geom_line() + 
-  geom_point() +
-  geom_errorbar(aes(ymin = mean - 1.96*sd, ymax = mean + 1.96*sd)) +
-  facet_wrap(~range_pc, scales = "free")
-
-# median and quantiles
-diff |> 
-  group_by(pc, range_pc) |>
-  summarize(median = median(value), 
-            low = quantile(value, 0.05),
-            high = quantile(value, 0.95)) |>
-  ggplot(aes(pc, median)) +
-  geom_line() +
-  geom_point() +
-  geom_errorbar(aes(ymin = low, ymax = high)) +
-  facet_wrap(~range_pc, scales = "free")
+  geom_point()
 ```
 
 ## Reproducibility
