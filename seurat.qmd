@@ -7,6 +7,8 @@ editor: source
 embed-resources: true
 execute:
   warning: false
+params:
+  pca: "irlba"
 ---
 
 # Setup
@@ -21,6 +23,17 @@ library(stringr)
 
 seed <- 23
 n_dim <- 100
+
+# parse input parameter
+if(params$pca > "irlba") {
+  pca_algo <- IrlbaParam()
+} else if(params$pca > "rsvd") {
+  pca_algo <- RandomParam()
+} else {
+  pca_algo <- ExactParam()
+}
+pca_algo
+
 set.seed(seed)
 ```
 
@@ -98,9 +111,7 @@ pbmc_sce <- runPCA(pbmc_sce,
                    subset_row = VariableFeatures(object = pbmc),
                    exprs_values = "scaledata",
                    ncomponents = n_dim,
-                   #BSPARAM = ExactParam()  # exact SVD
-                   BSPARAM = IrlbaParam()  # approximate SVD with irlba
-                   #BSPARAM = RandomParam() # approximate SVD with rsvd
+                   BSPARAM = pca_algo
                    ) 
 pbmc <- OverwriteSeurat(pbmc, pbmc_sce)
 
@@ -135,7 +146,8 @@ cpu_name <- cpu |>
   str_detect("AMD") |>
   ifelse("AMD", "Intel") |> 
   str_to_lower()
-write.csv(Embeddings(pbmc), file = paste0(cpu_name, ".csv"), row.names = FALSE)
+write.csv(Embeddings(pbmc), file = paste0(cpu_name, "_", params$pca, ".csv"), 
+          row.names = FALSE)
 ```
 
 ## Reproducibility
