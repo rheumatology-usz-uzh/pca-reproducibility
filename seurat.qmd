@@ -25,9 +25,9 @@ seed <- 23
 n_dim <- 100
 
 # parse input parameter
-if(params$pca > "irlba") {
+if(params$pca == "irlba") {
   pca_algo <- IrlbaParam()
-} else if(params$pca > "rsvd") {
+} else if(params$pca == "rsvd") {
   pca_algo <- RandomParam()
 } else {
   pca_algo <- ExactParam()

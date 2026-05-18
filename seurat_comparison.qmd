@@ -7,6 +7,8 @@ editor: source
 embed-resources: true
 execute:
   warning: false
+params:
+  pca: "irlba"
 ---
 
 # Setup
@@ -24,8 +26,8 @@ set.seed(23)
 Load matrices computed on AMD and Intel CPUs.
 
 ```{r}
-amd <- read.csv(file = "amd.csv") |> as.matrix()
-intel <- read.csv(file = "intel.csv") |> as.matrix()
+amd <- read.csv(file = paste0("amd_", params$pca, ".csv")) |> as.matrix()
+intel <- read.csv(file = paste0("intel_", params$pca, ".csv")) |> as.matrix()
 ```
 
 Compare differences.

@@ -1,30 +1,26 @@
 #!/usr/bin/bash -l
-#SBATCH --job-name=pca
-#SBATCH --time=01:00:00
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=2
-#SBATCH --mem-per-cpu=7G
 
-# input parameter: 'amd' or 'intel'
-CPU=$1
-echo "Load processor:" $CPU
-module load $CPU
 module load rstudio
 
-Rscript -e "quarto::quarto_render( \
-  input = 'seurat.qmd', \
-  output_file = '${CPU}_exact.html', \
-  execute_params = list(pca = 'exact') \
-)"
+CPU_TYPES=("amd" "intel")
+PCA_ALGOS=("exact" "irlba" "rsvd")
 
-Rscript -e "quarto::quarto_render( \
-  input = 'seurat.qmd', \
-  output_file = '${CPU}_irlba.html', \
-  execute_params = list(pca = 'irlba') \
-)"
+for CPU in ${CPU_TYPES[@]}; do
 
-Rscript -e "quarto::quarto_render( \
-  input = 'seurat.qmd', \
-  output_file = '${CPU}_rsvd.html', \
-  execute_params = list(pca = 'rsvd') \
-)"
+    echo "load processor:" $CPU
+    module load $CPU
+
+    for PCA in ${PCA_ALGOS[@]}; do
+
+        echo "pca algorithm:" $PCA
+
+        srun --pty -n 1 -c 2 --time=01:00:00 --mem=7G \
+          Rscript -e "quarto::quarto_render( \
+            input = 'seurat.qmd', \
+            output_file = '${CPU}_${PCA}.html', \
+            execute_params = list(pca = '${PCA}') \
+          )"
+
+    done
+
+done
