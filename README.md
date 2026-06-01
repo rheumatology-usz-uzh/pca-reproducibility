@@ -23,9 +23,10 @@ This happens in `R/dimensional_reduction.R` [here](https://github.com/satijalab/
 - Found reproducibility issue in scanpy for [UMAP and Leiden analysis](https://github.com/grst/scanpy_reproducibility)
 - Also mentioned in PCA [tutorial](https://ehrapy.readthedocs.io/en/latest/tutorials/notebooks/mimic_2_introduction.html#principle-component-analysis-pca) in ehrapy using scanpy
 
-## Workaround
+## Workarounds
 
-Current solution is to set `approx = F`.
+1. Current solution is to set `approx = F`.
+2. Replace openBLAS and openLAPACK libraries with Netlib libraries
 
 ## Next Steps
 
@@ -34,7 +35,6 @@ Current solution is to set `approx = F`.
 - [x] Find paper on numerical error propagation in the iterative algorithm used in `irlba`. -> Didn't find anything.
 - [x] Reproduce issue in data integration from OSCA [book](https://bioconductor.org/books/release/OSCA.multisample/integrating-datasets.html#mnn-correction)
 - [x] Send abstract to conference on [Symposium on Meta Science for Methods Research](https://crsuzh.pages.uzh.ch/msmr/)
-- [x] Replace openBLAS and openLAPACK libraries with Netlib solves the issue, but will be much solver
 - [ ] Write paper to raise awareness of this kind of issues:
     - Motivate using Seurat and `approx = T` as default setting.
     - Give numerical illustration of the propagation of error.
