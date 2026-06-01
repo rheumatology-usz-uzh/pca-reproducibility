@@ -9,8 +9,9 @@ The principal components in PCA can have flipped signed because the sign is math
 Run this on terminal on the cluster:
 
 ```shell
-bash sign.sh
+bash seurat_comparison.sh
 ```
+
 ## Backgound
 
 Issue in `RunPCA` in Seurat when `approx = T`. Eventually calls `irlba` in R package `irlba`.
@@ -33,6 +34,7 @@ Current solution is to set `approx = F`.
 - [x] Find paper on numerical error propagation in the iterative algorithm used in `irlba`. -> Didn't find anything.
 - [x] Reproduce issue in data integration from OSCA [book](https://bioconductor.org/books/release/OSCA.multisample/integrating-datasets.html#mnn-correction)
 - [x] Send abstract to conference on [Symposium on Meta Science for Methods Research](https://crsuzh.pages.uzh.ch/msmr/)
+- [x] Replace openBLAS and openLAPACK libraries with Netlib solves the issue, but will be about 70 solver
 - [ ] Write paper to raise awareness of this kind of issues:
     - Motivate using Seurat and `approx = T` as default setting.
     - Give numerical illustration of the propagation of error.
