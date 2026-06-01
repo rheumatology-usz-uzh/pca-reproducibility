@@ -26,7 +26,7 @@ This happens in `R/dimensional_reduction.R` [here](https://github.com/satijalab/
 ## Workarounds
 
 1. Current solution is to set `approx = F`.
-2. Replace openBLAS and openLAPACK libraries with Netlib libraries
+2. Replace OpenBLAS and OpenLAPACK libraries with their standard and not optimized Netlib libraries
 
 ## Next Steps
 
