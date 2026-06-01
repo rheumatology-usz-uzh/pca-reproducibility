@@ -1,0 +1,7 @@
+numpy
+matplotlib
+scikit-learn
+scikit-image
+igraph
+pooch
+scanpy
