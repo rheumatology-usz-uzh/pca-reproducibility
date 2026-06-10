@@ -21,7 +21,8 @@ This happens in `R/dimensional_reduction.R` [here](https://github.com/satijalab/
 ## Related Work
 
 - Found reproducibility issue in scanpy for [UMAP and Leiden analysis](https://github.com/grst/scanpy_reproducibility)
-- Also mentioned in PCA [tutorial](https://ehrapy.readthedocs.io/en/latest/tutorials/notebooks/mimic_2_introduction.html#principle-component-analysis-pca) in ehrapy using scanpy
+- Mentioned in PCA [tutorial](https://ehrapy.readthedocs.io/en/latest/tutorials/notebooks/mimic_2_introduction.html#principle-component-analysis-pca) in ehrapy using scanpy
+- Mentioned in simplified LEMUR blog [post](https://const-ae.name/post/2025-01-05_lemur_simplified/lemur-simplified/) as numerical instability
 
 ## Workarounds
 
