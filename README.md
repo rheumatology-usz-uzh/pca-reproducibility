@@ -42,6 +42,7 @@ export LD_PRELOAD=$BLAS:$LAPACK
 - [x] Find paper on numerical error propagation in the iterative algorithm used in `irlba`. -> Didn't find anything.
 - [x] Reproduce issue in data integration from OSCA [book](https://bioconductor.org/books/release/OSCA.multisample/integrating-datasets.html#mnn-correction)
 - [x] Send abstract to conference on [Symposium on Meta Science for Methods Research](https://crsuzh.pages.uzh.ch/msmr/)
+- [ ] Add correlation plot across hardware as in [paper](https://doi.org/10.1101/2025.10.28.681564)
 - [ ] Write paper to raise awareness of this kind of issues:
     - Motivate using Seurat and `approx = T` as default setting.
     - Give numerical illustration of the propagation of error.
