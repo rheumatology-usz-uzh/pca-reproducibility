@@ -15,7 +15,7 @@ echo "BLAS=$BLAS"
 echo "LAPACK=$LAPACK"
 
 CPU_TYPES=("amd" "intel")
-PCA_ALGOS=("exact" "irlba" "rsvd")
+PCA_ALGOS=("exact" "irlba")
 
 for CPU in ${CPU_TYPES[@]}; do
 

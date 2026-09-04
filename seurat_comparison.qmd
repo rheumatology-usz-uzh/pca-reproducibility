@@ -9,29 +9,61 @@ execute:
   warning: false
 ---
 
-# Setup
+## Setup
 
 ```{r}
 library(ggplot2)
 library(tidyr)
 library(dplyr)
 library(stringr)
+library(tibble)
+library(Seurat)
+library(patchwork)
 set.seed(23)
 ```
 
-## Mean Error Analysis
+## Visual Comparison
+
+Plot UMAP next to one another.
+
+```{r}
+#| fig-height: 9
+#| fig-width: 9
+
+cpu_types <- c("amd", "intel")
+pca_algos <- c("exact", "irlba")
+
+plot_list <- list()
+for(cpu in cpu_types) {
+  for(pca_algo in pca_algos) {
+    csv_file <- paste0(cpu, "_", pca_algo, ".rds")
+    pbmc <- readRDS(file = csv_file)
+    plot_list[[csv_file]] <- 
+      DimPlot(pbmc, reduction = "umap") + 
+      ggtitle(paste(cpu, pca_algo))
+  }
+}
+wrap_plots(plot_list, ncol = 2)
+```
+
+## Error Analysis
+
+### Embeddings
 
 Load matrices computed on AMD and Intel CPUs.
 
 ```{r}
-algorithm = c("exact", "irlba", "rsvd")
-file_amd = paste0("amd_", algorithm, ".csv")
-file_intel = paste0("intel_", algorithm, ".csv")
+algorithm = c("exact", "irlba")
+file_amd = paste0("amd_", algorithm, ".rds")
+file_intel = paste0("intel_", algorithm, ".rds")
 
 df <- lapply(seq_along(algorithm), function(index) {
-
-  amd <- read.csv(file = file_amd[index]) |> as.matrix()
-  intel <- read.csv(file = file_intel[index]) |> as.matrix()
+  print(file_amd[index])
+  print(file_intel[index])
+  
+  amd <- readRDS(file = file_amd[index]) |> Embeddings(reduction = "pca")
+  intel <- readRDS(file = file_intel[index]) |> Embeddings(reduction = "pca")
+  
   diff <- amd - intel
   diff |> 
     as_tibble() |>
@@ -67,6 +99,45 @@ df |>
   geom_hline(yintercept = 0, linetype = "dashed") +
   geom_line() + 
   geom_point()
+```
+
+### Loadings
+
+Compare the PCs by correlating them to the exact PC on AMD.
+
+```{r}
+#| fig-height: 9
+#| 
+cpu_types <- c("amd", "intel")
+pca_algos <- c("exact", "irlba")
+
+# read files
+loading_list <- list()
+for(cpu in cpu_types) {
+  for(pca_algo in pca_algos) {
+    csv_file <- paste0(cpu, "_", pca_algo, ".rds")
+    print(csv_file)
+    loadings <- readRDS(file = csv_file) |> Loadings(reduction = "pca")
+    key <- paste0(cpu, "_", pca_algo)
+    loading_list[[key]] <- loadings
+  }
+}
+
+# calculate correlations with respect to exact AMD
+df_corr <- sapply(names(loading_list), function(key) {
+  diag(cor(loading_list[["amd_exact"]], loading_list[[key]]))
+})
+
+# reshape and plot correlations
+df_corr |>
+  as_tibble() |>
+  rownames_to_column(var = "coordinate") |>
+  mutate(coordinate = as.integer(coordinate)) |>
+  pivot_longer(-coordinate, names_to = "method", values_to = "corr") |>
+  ggplot(aes(x = method, y = coordinate, fill = corr)) +
+  geom_tile(color = "white", linewidth = 0.5) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ## Reproducibility
