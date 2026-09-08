@@ -101,6 +101,43 @@ df |>
   geom_point()
 ```
 
+Compare the PCs by correlating them to the exact PC on AMD.
+
+```{r}
+#| fig-height: 9
+#| 
+cpu_types <- c("amd", "intel")
+pca_algos <- c("exact", "irlba")
+
+# read files
+pca_list <- list()
+for(cpu in cpu_types) {
+  for(pca_algo in pca_algos) {
+    csv_file <- paste0(cpu, "_", pca_algo, ".rds")
+    print(csv_file)
+    embeedings <- readRDS(file = csv_file) |> Embeddings(reduction = "pca")
+    key <- paste0(cpu, "_", pca_algo)
+    pca_list[[key]] <- embeedings
+  }
+}
+
+# calculate correlations with respect to exact AMD
+df_corr <- sapply(names(pca_list), function(key) {
+  diag(cor(pca_list[["amd_exact"]], pca_list[[key]]))
+})
+
+# reshape and plot correlations
+df_corr |>
+  as_tibble() |>
+  rownames_to_column(var = "coordinate") |>
+  mutate(coordinate = as.integer(coordinate)) |>
+  pivot_longer(-coordinate, names_to = "method", values_to = "corr") |>
+  ggplot(aes(x = method, y = coordinate, fill = corr)) +
+  geom_tile(color = "white", linewidth = 0.5) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
 ### Loadings
 
 Compare the PCs by correlating them to the exact PC on AMD.
@@ -112,20 +149,20 @@ cpu_types <- c("amd", "intel")
 pca_algos <- c("exact", "irlba")
 
 # read files
-loading_list <- list()
+pca_list <- list()
 for(cpu in cpu_types) {
   for(pca_algo in pca_algos) {
     csv_file <- paste0(cpu, "_", pca_algo, ".rds")
     print(csv_file)
     loadings <- readRDS(file = csv_file) |> Loadings(reduction = "pca")
     key <- paste0(cpu, "_", pca_algo)
-    loading_list[[key]] <- loadings
+    pca_list[[key]] <- loadings
   }
 }
 
 # calculate correlations with respect to exact AMD
-df_corr <- sapply(names(loading_list), function(key) {
-  diag(cor(loading_list[["amd_exact"]], loading_list[[key]]))
+df_corr <- sapply(names(pca_list), function(key) {
+  diag(cor(pca_list[["amd_exact"]], pca_list[[key]]))
 })
 
 # reshape and plot correlations
