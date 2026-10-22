@@ -26,7 +26,7 @@ for CPU in ${CPU_TYPES[@]}; do
 
       echo "pca algorithm:" $PCA
       srun --pty -n 1 -c 2 --time=01:00:00 --mem=7G \
-        apptainer exec --env LD_PRELOAD=$BLAS:$LAPACK \
+	apptainer exec --env LD_PRELOAD=$BLAS:$LAPACK,OPENBLAS_CORETYPE=Cooperlake,OPENBLAS_NUM_THREADS=2 \
         /apps/u24/opt/containers/rstudio/4.5.2.sif \
         quarto render seurat.qmd --output ${CPU}_${PCA}.html -P pca:$PCA
 

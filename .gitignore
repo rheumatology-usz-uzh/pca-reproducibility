@@ -7,5 +7,6 @@ filtered_gene_bc_matrices
 *.html
 *.rds
 *.csv
+*.txt
 .ipynb_checkpoints
 .DS_Store
