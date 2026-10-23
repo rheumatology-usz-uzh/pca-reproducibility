@@ -1,6 +1,6 @@
-# make_figures.R -- reproduces Figure 1 (figs/agreement.pdf), the numbers in Table 2 and the
-# summary statistics quoted in the "Numerical illustration" section of paper.tex.
-# Run from the directory containing paper.tex:  Rscript make_figures.R
+# illustration.R -- reproduces the agreement figure (figs/agreement.pdf), the numbers in the
+# moments table and the statistics quoted in the "Numerical illustration" section of blas_kernels.tex.
+# Run from the directory containing blas_kernels.tex:  Rscript illustration.R
 library(ggplot2)
 
 set.seed(2026)
@@ -64,6 +64,27 @@ fig <- ggplot() +
   theme(legend.position = "bottom")
 dir.create("figs", showWarnings = FALSE)
 ggsave("figs/agreement.pdf", fig, width = 6.5, height = 4)
+
+# Accuracy of f0 against exact rational arithmetic (needs the gmp package), and failure of the
+# textbook alternating-sum formula in double precision; both are quoted in Section 5
+if (requireNamespace("gmp", quietly = TRUE)) {
+  exact_f0 <- function(k) {
+    half <- gmp::as.bigq(k, 2); s <- gmp::as.bigq(0)
+    for (j in 0:floor(k / 2)) s <- s + (-1)^j * gmp::chooseZ(k, j) * (half - j)^(k - 1)
+    as.numeric(s / gmp::factorialZ(k - 1))
+  }
+  alt_sum <- function(k) {
+    j <- 0:floor(k / 2)
+    sum((-1)^j * choose(k, j) * (k / 2 - j)^(k - 1)) / factorial(k - 1)
+  }
+  ks <- c(2:120, 150, 200, 300, 500, 750, 1000, 1500, 2001)
+  ex <- sapply(ks, exact_f0)
+  cat(sprintf("Cox-de Boor recurrence: max relative error %.1e over %d values of k up to %d\n",
+              max(abs(sapply(ks, f0) - ex) / ex), length(ks), max(ks)))
+  ra <- abs(sapply(ks, alt_sum) - ex) / ex
+  cat(sprintf("alternating sum in double precision: relative error first > 1%% at k = %d, > 100%% at k = %d\n",
+              ks[which(ra > 0.01)[1]], ks[which(ra > 1)[1]]))
+}
 
 # Numbers quoted in the text and in Table 2
 cat(sprintf("max deviation from f_{n+1}(0): %.1f standard errors\n",
