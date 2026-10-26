@@ -54,8 +54,8 @@ ggsave("figs/agreement.pdf", fig, width = 6.5, height = 4)
 # Numbers quoted in the text
 two <- sim$n == 2
 cat(sprintf("n = 2: agreement rate %.3f (standard error %.3f); exact value 3/4\n", sim$p[two], sim$se[two]))
-cat(sprintf("n = 2: the approximation exceeds the simulated rate by %.1f%%\n",
-            100 * (sim$approx[two] / sim$p[two] - 1)))
+cat(sprintf("n = 2: the approximation %.3f exceeds the exact value 3/4 by %.1f%%\n",
+            sim$approx[two], 100 * (sim$approx[two] / 0.75 - 1)))
 z <- (sim$approx - sim$p) / sim$se
 cat(sprintf("n >= 10: approximation within %.1f standard errors of every simulated rate\n",
             max(abs(z[sim$n >= 10]))))
