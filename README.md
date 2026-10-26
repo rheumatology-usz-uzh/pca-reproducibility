@@ -26,20 +26,20 @@ This happens in `R/dimensional_reduction.R` [here](https://github.com/satijalab/
 
 ## Workarounds
 
-1. Current solution is to set `approx = F`.
-2. Replace OpenBLAS and OpenLAPACK libraries with their standard and not optimized Netlib libraries. In R:
+1. Set kernel and the thread count
+
+```bash
+apptainer exec --env OPENBLAS_CORETYPE=Cooperlake,OPENBLAS_NUM_THREADS=2 \
+  rstudio_4.5.2.sif Rscript analysis.R
+```
+
+2. Current solution is to set `approx = F`.
+3. Replace OpenBLAS and OpenLAPACK libraries with their standard and not optimized Netlib libraries. In R:
 
 ```bash
 BLAS="/usr/lib/x86_64-linux-gnu/blas/libblas.so"
 LAPACK="/usr/lib/x86_64-linux-gnu/lapack/liblapack.so"
 export LD_PRELOAD=$BLAS:$LAPACK
-```
-
-3. Set kernel and the thread count
-
-```bash
-apptainer exec --env OPENBLAS_CORETYPE=Cooperlake,OPENBLAS_NUM_THREADS=2 \
-  rstudio_4.5.2.sif Rscript analysis.R
 ```
 
 ## Next Steps
@@ -49,7 +49,4 @@ apptainer exec --env OPENBLAS_CORETYPE=Cooperlake,OPENBLAS_NUM_THREADS=2 \
 - [x] Find paper on numerical error propagation in the iterative algorithm used in `irlba`. -> Didn't find anything.
 - [x] Reproduce issue in data integration from OSCA [book](https://bioconductor.org/books/release/OSCA.multisample/integrating-datasets.html#mnn-correction)
 - [x] Send abstract to conference on [Symposium on Meta Science for Methods Research](https://crsuzh.pages.uzh.ch/msmr/)
-- [ ] Write paper to raise awareness of this kind of issues:
-    - Motivate using Seurat and `approx = T` as default setting
-    - Give numerical illustration of the propagation of error
-    - Add correlation plot across hardware as in [paper](https://doi.org/10.1101/2025.10.28.681564)
+- [ ] Write paper to raise awareness of this kind of issues
