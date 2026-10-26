@@ -35,6 +35,13 @@ LAPACK="/usr/lib/x86_64-linux-gnu/lapack/liblapack.so"
 export LD_PRELOAD=$BLAS:$LAPACK
 ```
 
+3. Set kernel and the thread count
+
+```bash
+apptainer exec --env OPENBLAS_CORETYPE=Cooperlake,OPENBLAS_NUM_THREADS=2 \
+  rstudio_4.5.2.sif Rscript analysis.R
+```
+
 ## Next Steps
 
 - [x] Check code in `irlba` -> not a bug, looks like it's a low-level difference in the linear algebra libraries BLAS and LAPACK
