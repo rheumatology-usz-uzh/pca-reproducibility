@@ -34,7 +34,7 @@ apptainer exec --env OPENBLAS_CORETYPE=Cooperlake,OPENBLAS_NUM_THREADS=2 \
 ```
 
 2. Current solution is to set `approx = F`.
-3. Replace OpenBLAS and OpenLAPACK libraries with their standard and not optimized Netlib libraries. In R:
+3. Replace OpenBLAS and OpenLAPACK libraries with their standard and not optimized Netlib libraries:
 
 ```bash
 BLAS="/usr/lib/x86_64-linux-gnu/blas/libblas.so"
